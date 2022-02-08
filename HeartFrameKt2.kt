@@ -1,13 +1,27 @@
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
+import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
 // 动画版的画心，从上边顺时针绘制
 class HeartFrameKt2 : JFrame() {
     init {
-        add(HeartPanel())
+        val panel = HeartPanel()
+        val jButton = JButton("refresh")
+        add(panel, BorderLayout.CENTER)
+        add(jButton, BorderLayout.SOUTH)
+        var thread = Thread {
+            while (true) {
+                var refresh = true
+                EventQueue.invokeLater {
+                    refresh = panel.refresh()
+                }
+                Thread.sleep(25)
+            }
+        }
+        thread.start()
+        jButton.addActionListener {
+            panel.clear()
+        }
     }
 
     inner class HeartPanel : JPanel() {
@@ -22,14 +36,13 @@ class HeartFrameKt2 : JFrame() {
             g2.stroke = BasicStroke(3.0f)
             g2.color = Color.RED
 
-            val inc = Math.PI / 45
+            val inc = Math.PI / 90
             if (i <= 2 * Math.PI) {
                 var x = getX(20, i.toFloat())
                 var y = getY(20, i.toFloat())
                 var p = OkPoint(x, y)
                 list.add(p)
                 i += inc
-                repaint(50 * 2)
             }
 
             for (i in list.indices) {
@@ -73,7 +86,6 @@ class HeartFrameKt2 : JFrame() {
                     g2.drawLine(-i, 0, -i, -sl)
                 }
             }
-            //println(height / 2)
             //y axis
             for (i in 0..height / 2 step 10) {
                 if (i % 50 == 0) {
@@ -84,6 +96,20 @@ class HeartFrameKt2 : JFrame() {
                     g2.drawLine(0, -i, sl, -i)
                 }
             }
+        }
+
+        fun refresh():Boolean {
+            return if (i <= 2 * Math.PI) {
+                repaint()
+                true
+            } else {
+                false
+            }
+        }
+
+        fun clear() {
+            i = 0.0
+            list.clear()
         }
     }
 

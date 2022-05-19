@@ -8,17 +8,17 @@ import javax.swing.JPanel
 import javax.swing.Timer
 
 /**
- * 第1版模仿H5的模拟时钟
+ * 第二版模仿H5的模拟时钟
  * http://www.youhutong.com/index.php/yanshi/index/331.html
  */
-class ClockFrameKt : JFrame() {
+class ClockFrameKt2 : JFrame() {
     init {
-        val clockPanel = ClockPanel()
+        val clockPanel = ClockPanel2()
         add(clockPanel)
         clockPanel.start()
     }
 
-    inner class ClockPanel : JPanel() {
+    inner class ClockPanel2 : JPanel() {
         val secondHandColor = Color(0xf3, 0xa8, 0x29)
         val minuteHandColor = Color(0x22, 0x22, 0x22)
         val hourHandColor = Color(0x22, 0x22, 0x22)
@@ -31,7 +31,7 @@ class ClockFrameKt : JFrame() {
             super.paintComponent(g)
             var g2: Graphics2D = g as Graphics2D
             g2.translate(width / 2, height / 2)
-            drawAxis(g2)
+//            drawAxis(g2)
 
             val theta = 2 * Math.PI / 60
             val radius = 150f
@@ -64,23 +64,8 @@ class ClockFrameKt : JFrame() {
                 g2.draw(line)
             }
 
-//            var rect = RoundRectangle2D.Float(150f, -5f, 35f, 10f, 8f, 8f)
-//            var rectSmall = RoundRectangle2D.Float(150f + 14f, -2.5f, 20f, 5f, 5f, 5f)
-
-//            var angle = 0.0
-//            var c = 0
-//            while (angle < 2 * Math.PI) {
-//                if (c % 5 == 0) {
-//                    g2.fill(rect)
-//                } else {
-//                    g2.fill(rectSmall)
-//                }
-//                g2.rotate(theta)
-//                angle += theta
-//                c++
-//            }
-
             var numRadius = radius * 0.9f
+            g2.font = Font("", Font.PLAIN, 22)
             //draw numbers
             var numTheta = 2 * Math.PI / 12
             for (i in 0..11) {
@@ -102,17 +87,21 @@ class ClockFrameKt : JFrame() {
             var basicStroke = BasicStroke(20.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = hourHandColor
-            x2 = radius * 0.75f * Math.cos(hourTheta * hour - Math.PI / 2).toFloat()
-            y2 = radius * 0.75f * Math.sin(hourTheta * hour - Math.PI / 2).toFloat()
+            /* hourTheta * (minute / 60f)分针变化对时针的影响 2pi/12*(minute/60) */
+            x2 = radius * 0.75f * Math.cos(hourTheta * hour + hourTheta * (minute / 60f) - Math.PI / 2).toFloat()
+            y2 = radius * 0.75f * Math.sin(hourTheta * hour + hourTheta * (minute / 60f) - Math.PI / 2).toFloat()
             var hourLine = Line2D.Float(x1, y1, x2, y2)
             g2.draw(hourLine)
+
+            //println("second:$second, ${theta * (second / 60f)}")
 
             //draw minute hand
             basicStroke = BasicStroke(9.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = minuteHandColor
-            x2 = radiusLong * 1.0f * Math.cos(theta * (minute) - Math.PI / 2).toFloat()
-            y2 = radiusLong * 1.0f * Math.sin(theta * (minute) - Math.PI / 2).toFloat()
+            /* theta * (second / 60f)秒针变化对分针的影响 //2pi/60 * (second/60)*/
+            x2 = radiusLong * 1.0f * Math.cos(theta * (minute) + theta * (second / 60f) - Math.PI / 2).toFloat()
+            y2 = radiusLong * 1.0f * Math.sin(theta * (minute) + theta * (second / 60f) - Math.PI / 2).toFloat()
             var minuteLine = Line2D.Float(x1, y1, x2, y2)
             g2.draw(minuteLine)
 
@@ -139,28 +128,6 @@ class ClockFrameKt : JFrame() {
             var circle = Ellipse2D.Float(0f - worh / 2f, 0f - worh / 2f, worh, worh)
             g2.draw(circle)
 
-
-//            var list = mutableListOf<OkPoint>()
-//            var i = 0.0
-//            val inc = Math.PI / 45 / 2
-//            while (i <= 2 * Math.PI) {
-//                var x = getX(20, i.toFloat())
-//                var y = getY(20, i.toFloat())
-//                var p = OkPoint(x, y)
-//                list.add(p)
-//                i += inc
-//            }
-
-            // start为起始点的角度，0代表x轴正方向，extent代表扫过的角度，正数为逆时针。
-//            var arc = Arc2D.Float(30f, 30f, 100f, 100f, 0f, 120f, Arc2D.OPEN)
-//            var arc2 = Arc2D.Float(-130f, -130f, 100f, 100f, 0f, 90f, Arc2D.CHORD)
-//            var arc3 = Arc2D.Float(-130f, 130f, 100f, 100f, 0f, 45f, Arc2D.PIE)
-//            g2.draw(arc)
-//            g2.draw(arc2)
-//            g2.draw(arc3)
-//            g2.fill(arc)
-//            g2.fill(arc2)
-//            g2.fill(arc3)
         }
 
         fun drawAxis(g: Graphics?) {
@@ -204,7 +171,6 @@ class ClockFrameKt : JFrame() {
             this.hour = hour
             this.minute = minute
             this.second = second
-            //println("hour:${hour % 12}, minute:$minute, second:$second")
             repaint()
         }
 
@@ -216,7 +182,6 @@ class ClockFrameKt : JFrame() {
                 var minute = calendar.get(Calendar.MINUTE)
                 var second = calendar.get(Calendar.SECOND)
                 setCurrentTime(hour % 12, minute, second)
-//                setCurrentTime(12, 0, 0)
             }
             timer.start()
         }
@@ -225,7 +190,7 @@ class ClockFrameKt : JFrame() {
 }
 
 fun main(args: Array<String>) {
-    var frame = ClockFrameKt()
+    var frame = ClockFrameKt2()
     frame.apply {
         setSize(500, 450)
         title = "Kotlin clock"

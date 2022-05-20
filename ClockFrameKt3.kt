@@ -1,24 +1,22 @@
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
-import java.awt.geom.RoundRectangle2D
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.Timer
 
 /**
- * 第二版模仿H5的模拟时钟
- * http://www.youhutong.com/index.php/yanshi/index/331.html
+ * 第三版高仿H5模拟时钟部分代码优化
  */
-class ClockFrameKt2 : JFrame() {
+class ClockFrameKt3 : JFrame() {
     init {
-        val clockPanel = ClockPanel2()
+        val clockPanel = ClockPanel()
         add(clockPanel)
         clockPanel.start()
     }
 
-    inner class ClockPanel2 : JPanel() {
+    inner class ClockPanel : JPanel() {
         val secondHandColor = Color(0xf3, 0xa8, 0x29)
         val minuteHandColor = Color(0x22, 0x22, 0x22)
         val hourHandColor = Color(0x22, 0x22, 0x22)
@@ -46,20 +44,22 @@ class ClockFrameKt2 : JFrame() {
                 var y1 = 0f
                 var x2 = 0f
                 var y2 = 0f
+                val cost = Math.cos(theta * i)
+                val sint = Math.sin(theta * i)
                 // hour marker
                 if (i % 5 == 0) {
-                    x1 = (Math.cos(theta * i) * radiusEnd * 0.90).toFloat()
-                    y1 = (Math.sin(theta * i) * radiusEnd * 0.90).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
+                    x1 = (cost * radiusEnd * 0.90).toFloat()
+                    y1 = (sint * radiusEnd * 0.90).toFloat()
+                    x2 = (cost * radiusEnd).toFloat()
+                    y2 = (sint * radiusEnd).toFloat()
                     line = Line2D.Float(x1,y1,x2,y2)
                     g2.stroke = big
                 } else {
                     // minute marker
-                    x1 = (Math.cos(theta * i) * radiusEnd * 0.95).toFloat()
-                    y1 = (Math.sin(theta * i) * radiusEnd * 0.95).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
+                    x1 = (cost * radiusEnd * 0.95).toFloat()
+                    y1 = (sint * radiusEnd * 0.95).toFloat()
+                    x2 = (cost * radiusEnd).toFloat()
+                    y2 = (sint * radiusEnd).toFloat()
                     line = Line2D.Float(x1,y1,x2,y2)
                     g2.stroke = small
                 }
@@ -133,7 +133,7 @@ class ClockFrameKt2 : JFrame() {
             var secondLine = Line2D.Float(x1, y1, x2, y2)
             g2.draw(secondLine);
 
-            //draw second handle
+            //draw second tail handle
             basicStroke = BasicStroke(13.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = secondHandColor
@@ -214,7 +214,7 @@ class ClockFrameKt2 : JFrame() {
 }
 
 fun main(args: Array<String>) {
-    var frame = ClockFrameKt2()
+    var frame = ClockFrameKt3()
     frame.apply {
         setSize(500, 450)
         title = "Kotlin clock"

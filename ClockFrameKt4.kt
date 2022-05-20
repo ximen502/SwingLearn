@@ -1,28 +1,29 @@
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
-import java.awt.geom.RoundRectangle2D
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.Timer
 
 /**
- * 第二版模仿H5的模拟时钟
- * http://www.youhutong.com/index.php/yanshi/index/331.html
+ * 仿led屏的模拟时钟
  */
-class ClockFrameKt2 : JFrame() {
+class ClockFrameKt4 : JFrame() {
     init {
-        val clockPanel = ClockPanel2()
+        val clockPanel = ClockPanel()
+        clockPanel.background = Color(0x29, 0x24, 0x21)
         add(clockPanel)
         clockPanel.start()
     }
 
-    inner class ClockPanel2 : JPanel() {
-        val secondHandColor = Color(0xf3, 0xa8, 0x29)
-        val minuteHandColor = Color(0x22, 0x22, 0x22)
-        val hourHandColor = Color(0x22, 0x22, 0x22)
+    inner class ClockPanel : JPanel() {
+        val secondHandColor = Color.GREEN
+        val minuteHandColor = Color.RED
+        val hourHandColor = Color.YELLOW
         val markColor = Color(0x22, 0x22, 0x22)
+        val markBigColor = Color.RED
+        val markSmallColor = Color.GREEN
         var hour = 0
         var minute = 0
         var second = 0
@@ -31,68 +32,60 @@ class ClockFrameKt2 : JFrame() {
             super.paintComponent(g)
             var g2: Graphics2D = g as Graphics2D
             g2.translate(width / 2, height / 2)
-            //drawAxis(g2)
+//            drawAxis(g2)
+
+            g2.color = markColor
+            g2.drawString("北极星", -20, 50)
 
             val theta = 2 * Math.PI / 60
             val radius = 150f
             val radiusLong = 164f
             val radiusEnd = 178
             g2.color = markColor
-            var line: Line2D.Float
-            val big = BasicStroke(10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
-            val small = BasicStroke(5.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+//            var line: Line2D.Float
+//            val big = BasicStroke(10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+//            val small = BasicStroke(5.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+            var ellipse: Ellipse2D
+            val size = 6f
+            val sizeBig = 12f
             for (i in 0 until 60) {
                 var x1 = 0f
                 var y1 = 0f
                 var x2 = 0f
                 var y2 = 0f
-                // hour marker
                 if (i % 5 == 0) {
-                    x1 = (Math.cos(theta * i) * radiusEnd * 0.90).toFloat()
-                    y1 = (Math.sin(theta * i) * radiusEnd * 0.90).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
-                    line = Line2D.Float(x1,y1,x2,y2)
-                    g2.stroke = big
+                    x1 = (Math.cos(theta * i) * radiusLong).toFloat()
+                    y1 = (Math.sin(theta * i) * radiusLong).toFloat()
+                    x2 = (Math.cos(theta * i) * radiusEnd - sizeBig / 2).toFloat()
+                    y2 = (Math.sin(theta * i) * radiusEnd - sizeBig / 2).toFloat()
+                    //line = Line2D.Float(x1,y1,x2,y2)
+                    ellipse = Ellipse2D.Float(x2, y2, sizeBig, sizeBig)
+                    //g2.stroke = big
+                    g2.color = markBigColor
                 } else {
-                    // minute marker
-                    x1 = (Math.cos(theta * i) * radiusEnd * 0.95).toFloat()
-                    y1 = (Math.sin(theta * i) * radiusEnd * 0.95).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
-                    line = Line2D.Float(x1,y1,x2,y2)
-                    g2.stroke = small
+                    x1 = (Math.cos(theta * i) * (radiusLong)).toFloat()
+                    y1 = (Math.sin(theta * i) * (radiusLong)).toFloat()
+                    x2 = (Math.cos(theta * i) * radiusEnd - size / 2).toFloat()
+                    y2 = (Math.sin(theta * i) * radiusEnd - size / 2).toFloat()
+                    //line = Line2D.Float(x1,y1,x2,y2)
+                    //g2.stroke = small
+                    ellipse = Ellipse2D.Float(x2, y2, size, size)
+                    g2.color = markSmallColor
                 }
-                g2.draw(line)
+                //g2.draw(line)
+                g2.fill(ellipse)
             }
 
-            var numRadius = radius * 0.9f
-            g2.font = Font("", Font.PLAIN, 22)
-            var fontMetrics = getFontMetrics(g2.font)
-            //draw numbers
-            var numTheta = 2 * Math.PI / 12
-            for (i in 0..11) {
-                var x1 = Math.cos(numTheta * i - Math.PI / 3) * numRadius
-                var y1 = Math.sin(numTheta * i - Math.PI / 3) * numRadius
-                //println("x1:$x1, y1:$y1")
-                // 测量字符串宽度
-                var num = (i + 1).toString()
-                var strW = fontMetrics.stringWidth(num)
-                g2.drawString(num, (x1 - strW / 2).toFloat(), y1.toFloat())
-            }
-
-            var font = Font("",Font.PLAIN, 14)
-            var fontSmall = Font("",Font.PLAIN, 10)
-            val brand = "北极星"
-            val brandPlace = "亚洲"
-            fontMetrics = getFontMetrics(font)
-            var bW = fontMetrics.stringWidth(brand)
-            g2.font = font
-            g2.drawString(brand, 0 - bW / 2, radius.toInt() / 2)
-            fontMetrics = getFontMetrics(fontSmall)
-            var bpW = fontMetrics.stringWidth(brandPlace)
-            g2.font = fontSmall
-            g2.drawString(brandPlace, 0 - bpW / 2, radius.toInt() / 2 + 15)
+//            var numRadius = radius * 0.9f
+//            g2.font = Font("", Font.PLAIN, 22)
+//            //draw numbers
+//            var numTheta = 2 * Math.PI / 12
+//            for (i in 0..11) {
+//                var x1 = Math.cos(numTheta * i - Math.PI / 3) * numRadius
+//                var y1 = Math.sin(numTheta * i - Math.PI / 3) * numRadius
+//                //println("x1:$x1, y1:$y1")
+//                g2.drawString((i + 1).toString(), x1.toFloat(), y1.toFloat())
+//            }
 
 
             var x1 = 0f
@@ -103,7 +96,7 @@ class ClockFrameKt2 : JFrame() {
             var hourTheta = 2 * Math.PI / 12
             //draw hour hand
             //修线条粗细
-            var basicStroke = BasicStroke(20.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+            var basicStroke = BasicStroke(15.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = hourHandColor
             /* hourTheta * (minute / 60f)分针变化对时针的影响 2pi/12*(minute/60) */
@@ -115,7 +108,7 @@ class ClockFrameKt2 : JFrame() {
             //println("second:$second, ${theta * (second / 60f)}")
 
             //draw minute hand
-            basicStroke = BasicStroke(9.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+            basicStroke = BasicStroke(5.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = minuteHandColor
             /* theta * (second / 60f)秒针变化对分针的影响 //2pi/60 * (second/60)*/
@@ -125,25 +118,25 @@ class ClockFrameKt2 : JFrame() {
             g2.draw(minuteLine)
 
             //draw second hand
-            basicStroke = BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+            basicStroke = BasicStroke(2.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = secondHandColor
-            x2 = radiusLong * 1.08f * Math.cos(theta * (second) - Math.PI / 2).toFloat()
-            y2 = radiusLong * 1.08f * Math.sin(theta * (second) - Math.PI / 2).toFloat()
+            x2 = radiusLong * 1.1f * Math.cos(theta * (second) - Math.PI / 2).toFloat()
+            y2 = radiusLong * 1.1f * Math.sin(theta * (second) - Math.PI / 2).toFloat()
             var secondLine = Line2D.Float(x1, y1, x2, y2)
             g2.draw(secondLine);
 
             //draw second handle
-            basicStroke = BasicStroke(13.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
+            basicStroke = BasicStroke(6.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
             g2.stroke = basicStroke
             g2.color = secondHandColor
-            x2 = radiusLong * 0.1f * Math.cos(theta * (second) - Math.PI / 2).toFloat()
-            y2 = radiusLong * 0.1f * Math.sin(theta * (second) - Math.PI / 2).toFloat()
+            x2 = radiusLong * 0.2f * Math.cos(theta * (second) - Math.PI / 2).toFloat()
+            y2 = radiusLong * 0.2f * Math.sin(theta * (second) - Math.PI / 2).toFloat()
             secondLine = Line2D.Float(x1, y1, -x2, -y2)
             g2.draw(secondLine);
 
             // draw circle cover three hands
-            var worh = 16f
+            var worh = 8f
             var circle = Ellipse2D.Float(0f - worh / 2f, 0f - worh / 2f, worh, worh)
             g2.draw(circle)
 
@@ -206,15 +199,10 @@ class ClockFrameKt2 : JFrame() {
         }
     }
 
-    //转弧度
-    fun toRadians(deg: Float): Float {
-        return ((Math.PI / 180) * deg).toFloat();
-    }
-
 }
 
 fun main(args: Array<String>) {
-    var frame = ClockFrameKt2()
+    var frame = ClockFrameKt4()
     frame.apply {
         setSize(500, 450)
         title = "Kotlin clock"

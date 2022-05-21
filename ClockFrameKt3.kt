@@ -28,6 +28,7 @@ class ClockFrameKt3 : JFrame() {
         override fun paintComponent(g: Graphics?) {
             super.paintComponent(g)
             var g2: Graphics2D = g as Graphics2D
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g2.translate(width / 2, height / 2)
             //drawAxis(g2)
 
@@ -81,6 +82,7 @@ class ClockFrameKt3 : JFrame() {
                 g2.drawString(num, (x1 - strW / 2).toFloat(), y1.toFloat())
             }
 
+            // draw brand、产地
             var font = Font("",Font.PLAIN, 14)
             var fontSmall = Font("",Font.PLAIN, 10)
             val brand = "北极星"
@@ -89,6 +91,7 @@ class ClockFrameKt3 : JFrame() {
             var bW = fontMetrics.stringWidth(brand)
             g2.font = font
             g2.drawString(brand, 0 - bW / 2, radius.toInt() / 2)
+
             fontMetrics = getFontMetrics(fontSmall)
             var bpW = fontMetrics.stringWidth(brandPlace)
             g2.font = fontSmall
@@ -111,8 +114,6 @@ class ClockFrameKt3 : JFrame() {
             y2 = radius * 0.75f * Math.sin(hourTheta * hour + hourTheta * (minute / 60f) - Math.PI / 2).toFloat()
             var hourLine = Line2D.Float(x1, y1, x2, y2)
             g2.draw(hourLine)
-
-            //println("second:$second, ${theta * (second / 60f)}")
 
             //draw minute hand
             basicStroke = BasicStroke(9.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
@@ -206,7 +207,7 @@ class ClockFrameKt3 : JFrame() {
         }
     }
 
-    //转弧度
+    //转弧度 ->直接调用Math.toRadians(deg)即可，多此一举
     fun toRadians(deg: Float): Float {
         return ((Math.PI / 180) * deg).toFloat();
     }

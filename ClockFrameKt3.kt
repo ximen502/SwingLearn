@@ -79,7 +79,8 @@ class ClockFrameKt3 : JFrame() {
                 // 测量字符串宽度
                 var num = (i + 1).toString()
                 var strW = fontMetrics.stringWidth(num)
-                g2.drawString(num, (x1 - strW / 2).toFloat(), y1.toFloat())
+                var strH = g2.font.size
+                g2.drawString(num, (x1 - strW / 2).toFloat(), (y1 + strH / 2).toFloat())
             }
 
             // draw brand、产地

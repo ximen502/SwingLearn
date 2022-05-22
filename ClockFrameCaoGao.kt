@@ -42,30 +42,59 @@ class ClockFrameCaoGao : JFrame() {
             var line: Line2D.Float
             val big = BasicStroke(10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
             val small = BasicStroke(5.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER)
-            /* 循环内的y值为负，则相当于坐标系变为了数学中的坐标系，y轴的正方向指向上方，而默认y轴的正方向指向下方，这时候刻度将会逆时针绘制
-            * 如果y为正，则刻度会顺时针绘制，H5的代码是逆时针绘制的 */
+            // 使用斜线与y轴夹角计算方式, +y逆时针from6:00 -y顺时针from12:00
             for (i in 0 until end) {
                 var x1 = 0f
                 var y1 = 0f
                 var x2 = 0f
                 var y2 = 0f
+                var sint = Math.sin(theta * i)
+                var cost = Math.cos(theta * i)
                 if (i % 5 == 0) {
-                    x1 = (Math.cos(theta * i) * radiusLong).toFloat()
-                    y1 = (Math.sin(theta * i) * radiusLong).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
+                    x1 = (sint * (radiusEnd * 0.88)).toFloat()
+                    y1 = -(cost * (radiusEnd * 0.88)).toFloat()
+                    x2 = (sint * radiusEnd).toFloat()
+                    y2 = -(cost * radiusEnd).toFloat()
                     line = Line2D.Float(x1,y1,x2,y2)
                     g2.stroke = big
                 } else {
-                    x1 = (Math.cos(theta * i) * (radiusLong+5)).toFloat()
-                    y1 = (Math.sin(theta * i) * (radiusLong+5)).toFloat()
-                    x2 = (Math.cos(theta * i) * radiusEnd).toFloat()
-                    y2 = (Math.sin(theta * i) * radiusEnd).toFloat()
+                    x1 = (sint * (radiusEnd*0.95)).toFloat()
+                    y1 = -(cost * (radiusEnd*0.95)).toFloat()
+                    x2 = (sint * radiusEnd).toFloat()
+                    y2 = -(cost * radiusEnd).toFloat()
                     line = Line2D.Float(x1,y1,x2,y2)
                     g2.stroke = small
                 }
                 g2.draw(line)
             }
+
+            /* 循环内的y值为负，则相当于坐标系变为了数学中的坐标系，y轴的正方向指向上方，而默认y轴的正方向指向下方，这时候刻度将会逆时针绘制
+            * 如果y为正，则刻度会顺时针绘制，H5的代码是逆时针绘制的 */
+            // 使用斜线与x轴夹角计算方式，if +y 顺时针from 3:00 / if -y 逆时针from 3:00
+//            for (i in 0 until end) {
+//                var x1 = 0f
+//                var y1 = 0f
+//                var x2 = 0f
+//                var y2 = 0f
+//                val cost = Math.cos(theta * i)
+//                val sint = Math.sin(theta * i)
+//                if (i % 5 == 0) {
+//                    x1 = (cost * radiusLong).toFloat()
+//                    y1 = -(sint * radiusLong).toFloat()
+//                    x2 = (cost * radiusEnd).toFloat()
+//                    y2 = -(sint * radiusEnd).toFloat()
+//                    line = Line2D.Float(x1,y1,x2,y2)
+//                    g2.stroke = big
+//                } else {
+//                    x1 = (cost * (radiusLong+5)).toFloat()
+//                    y1 = -(sint * (radiusLong+5)).toFloat()
+//                    x2 = (cost * radiusEnd).toFloat()
+//                    y2 = -(sint * radiusEnd).toFloat()
+//                    line = Line2D.Float(x1,y1,x2,y2)
+//                    g2.stroke = small
+//                }
+//                g2.draw(line)
+//            }
 
 //            var rect = RoundRectangle2D.Float(150f, -5f, 35f, 10f, 8f, 8f)
 //            var rectSmall = RoundRectangle2D.Float(150f + 14f, -2.5f, 20f, 5f, 5f, 5f)
